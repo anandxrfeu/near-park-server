@@ -4,6 +4,7 @@ import cors from 'cors'
 import dbConnect from './config/db.config.js'
 import userRouter from './routes/user.routes.js'
 import fileRouter from './routes/file.routes.js'
+import parkingLotRouter from './routes/parkingLot.routes.js'
 
 dbConnect()
 
@@ -15,6 +16,7 @@ app.use(cors({ origin: process.env.REACT_APP_URL }));
 
 app.use("/api", userRouter);
 app.use("/api", fileRouter);
+app.use("/api", parkingLotRouter);
 
 app.listen(Number(process.env.EXPRESS_PORT), () =>
   console.log(`Server up and running at port ${process.env.EXPRESS_PORT}`)
