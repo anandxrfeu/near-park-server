@@ -101,7 +101,7 @@ userRouter.patch("/users/profile", isAuthenticated, attachCurrentUser, async (re
   }
 });
 
-userRouter.patch("/users/profile/delete", isAuthenticated, attachCurrentUser, async (req, res) => {
+userRouter.delete("/users/profile", isAuthenticated, attachCurrentUser, async (req, res) => {
   try {
     const loggedInUser = req.currentUser;
     loggedInUser.deletedAt = Date.now()
@@ -150,7 +150,7 @@ userRouter.patch("/users/:userId", isAuthenticated, attachCurrentUser, isAdmin, 
     
   }catch(err) {
     console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
+    return res.status(500).json({ msg: "Internal server error." });
   }
 } )
 
