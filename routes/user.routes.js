@@ -131,15 +131,16 @@ userRouter.get("/users", isAuthenticated, attachCurrentUser, isAdmin, async (req
 // make owner active or inactive as admin
 userRouter.patch("/users/:userId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
   try{
-
+    const {userId} = req.params
     const requestedOperations = Object.keys(req.body)
-    const isValidOperation = requestedOperations.length === 1 && requestedOperations.includes("active")
+    const isValidOperation = requestedOperations.length === 1 && 
+                             requestedOperations.includes("active") &&
+                             userId !== req.currentUser._id.toString()
 
     if(!isValidOperation){
       return res.status(405).json({msg: "Method not allowed"})
 
     }
-    const {userId} = req.params
     const user = await User.findByIdAndUpdate(userId, req.body.active === true ? {deletedAt: undefined} :  {deletedAt: Date.now()} , {new: true})
     console.log(user)
     if(!user){
