@@ -89,7 +89,7 @@ userRouter.patch("/users/profile", isAuthenticated, attachCurrentUser, async (re
     const isValidOperaton = requestedUpdates.every(update => allowedUpdates.includes(update))
 
     if(!isValidOperaton){
-      return res.status(405).json({msg: "Method not allowed"})
+      return res.status(405).json({msg: "Operation not allowed"})
     }
     const loggedInUser = req.currentUser;
     requestedUpdates.forEach(update => loggedInUser[update] = req.body[update])
