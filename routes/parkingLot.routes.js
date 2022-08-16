@@ -25,7 +25,7 @@ parkingLotRouter.post("/parkingLots", isAuthenticated, attachCurrentUser, async 
 
 parkingLotRouter.get("/parkingLots", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
-        const parkingLots = await ParkingLot.find({user: req.currentUser._id})
+        const parkingLots = await ParkingLot.find({user: req.currentUser._id}, "-__v")
         return res.status(200).json(parkingLots)
     }catch(err){
         console.log(err);
@@ -37,8 +37,9 @@ parkingLotRouter.get("/parkingLots/:parkingLotId", isAuthenticated, attachCurren
     try{
         const parkingLot = await ParkingLot.findOne({_id: req.params.parkingLotId, user: req.currentUser._id})
         if(!parkingLot){
-            res.status(404).json({ msg: "Parking lot not found."})
+            return res.status(404).json({ msg: "Parking lot not found."})
         }
+        parkingLot.__v = undefined
         return res.status(200).json(parkingLot)
     }catch(err){
         console.log(err);
@@ -48,7 +49,7 @@ parkingLotRouter.get("/parkingLots/:parkingLotId", isAuthenticated, attachCurren
 
 parkingLotRouter.patch("/parkingLots/:parkingLotId", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
-        const allowedUpdates = ["address", "pricing", "maxOccupancy"]
+        const allowedUpdates = ["name", "address", "pricing", "maxOccupancy"]
         const requestedUpdates = Object.keys(req.body)
         const isValidOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
         if(!isValidOperation){
@@ -63,8 +64,8 @@ parkingLotRouter.patch("/parkingLots/:parkingLotId", isAuthenticated, attachCurr
         // use populate
         requestedUpdates.forEach(update => parkingLot[update] = req.body[update])
         await parkingLot.save()
+        parkingLot.__v = undefined
         return res.status(200).json(parkingLot)
-
     }catch(err){
         console.log(err);
         return res.status(500).json({msg: "Internal server error."})
@@ -78,7 +79,7 @@ parkingLotRouter.delete("/parkingLots/:parkingLotId", isAuthenticated, attachCur
         // use populat
         const parkingLot = await ParkingLot.findOneAndDelete({_id: req.params.parkingLotId, user: req.currentUser._id})
         if(!parkingLot){
-            res.status(404).json({ msg: "Parking lot not found."})
+            return res.status(404).json({ msg: "Parking lot not found."})
         }
         return res.status(204).json(parkingLot)
     }catch(err){
@@ -86,5 +87,17 @@ parkingLotRouter.delete("/parkingLots/:parkingLotId", isAuthenticated, attachCur
         return res.status(500).json({msg: "Internal server error."})
     }
 } )
+
+parkingLotRouter.get("/parkingLots/:parkingLotId/reservations", isAuthenticated, attachCurrentUser, async (req, res) => {
+    try{
+        const parkingLot = await ParkingLot.findOne({_id: req.params.parkingLotId, user: req.currentUser._id})
+        await parkingLot.populate("reservations").execPopulate()
+        return res.status(200).json(parkingLot.reservations)
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg: "Internal server error."})
+    }
+} )
+
 
 export default parkingLotRouter;

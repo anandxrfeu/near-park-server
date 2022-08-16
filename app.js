@@ -24,3 +24,4 @@ app.use("/api", ReservationRouter);
 app.listen(Number(process.env.EXPRESS_PORT), () =>
   console.log(`Server up and running at port ${process.env.EXPRESS_PORT}`)
 );
+  

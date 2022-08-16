@@ -14,14 +14,17 @@ const ReservationRouter = Router();
 ReservationRouter.post("/reservations", async (req, res) => {
     try{
         //check of all fields
-        const allowedFields = ["vehicle", "owner", "guestUserPhone", "parkingLot"]
+        const allowedFields = ["ticketNumber","vehicle", "owner", "guestUserPhone", "parkingLot"]
         const providedFields = Object.keys(req.body)
         const isValidOperation = providedFields.every(field => allowedFields.includes(field))
         if(!isValidOperation){
             return res.status(405).json({msg: "Operation not allowed"})
         }
         //auto increment ticket number
-        //check to ensure logged in phone number has only one active reservaion at the moment
+        const existingReservations =  await Reservation.find({guestUserPhone: req.body.guestUserPhone, status: {"$ne": "CLOSED"}  })
+        if(existingReservations.length !== 0){
+            return res.status(405).json({msg: "User has an active reservation"})
+        }
         const reservation = await Reservation.create(req.body)
         return res.status(201).json(reservation)
 
@@ -32,9 +35,10 @@ ReservationRouter.post("/reservations", async (req, res) => {
 } )
 
 
-ReservationRouter.get("/reservations/:guestPhoneNumber", async (req, res) => {
+ReservationRouter.get("/reservations/:guestUserPhone", async (req, res) => {
     try{
-        const reservation =  await Reservation.findOne({guestPhoneNumber: req.params.guestPhoneNumber, status: {"$ne": "CLOSED"} })
+        const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} })//.populate("parkingLot")
+        //await reservation.populate("parkingLot").execPopulate()
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
         }

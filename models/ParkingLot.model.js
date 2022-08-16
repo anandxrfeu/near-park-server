@@ -5,8 +5,7 @@ const parkingLotSchema = new Schema({
     name:{
         type: String,
         required: true,
-        trim: true,
-        unique: true
+        trim: true
     },
     address:{
         type: String,
@@ -59,6 +58,12 @@ const parkingLotSchema = new Schema({
 }, {
     timestamps: true
   })
+
+  parkingLotSchema.virtual("reservations", {
+    ref: "Reservation",
+    localField: "_id",
+    foreignField: "parkingLot"
+})
 
 const ParkingLot = model("ParkingLot", parkingLotSchema)
 
