@@ -6,6 +6,7 @@ import userRouter from './routes/user.routes.js'
 import fileRouter from './routes/file.routes.js'
 import parkingLotRouter from './routes/parkingLot.routes.js'
 import ReservationRouter from './routes/reservation.routes.js'
+import SubscriptionPlanRouter from "./routes/subscriptionPlan.routes.js"
 
 dbConnect()
 
@@ -19,6 +20,7 @@ app.use("/api", userRouter);
 app.use("/api", fileRouter);
 app.use("/api", parkingLotRouter);
 app.use("/api", ReservationRouter);
+app.use("/api", SubscriptionPlanRouter);
 
 
 app.listen(Number(process.env.EXPRESS_PORT), () =>

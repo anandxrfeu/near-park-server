@@ -76,7 +76,7 @@ ReservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) 
             return res.status(405).json({msg: "Operation not allowed"})
         }
 
-        const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} })//.populate("parkingLot")
+        const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} }).populate("parkingLot")
 
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
@@ -107,15 +107,12 @@ ReservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) 
     }
 })
 
-/**
- * Only used to change status to closed
- */
-ReservationRouter.patch("/reservations/guest/:reservationId", async (req, res) => {
+ReservationRouter.patch("/reservations/:reservationId", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
         
         const allowedUpdates = ["vehicle", "endedAt", "payBy", "status"]
-        const requestedUpdates = Object.keys(req.body)
-        const isValidOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
+        let requestedUpdates = Object.keys(req.body)
+        let isValidOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
         if((req.body.status && req.body.status ==="OPEN") || (req.body.payBy && req.body.payBy !=="CARD" ) ){
             isValidOperation = false
         }
@@ -123,11 +120,13 @@ ReservationRouter.patch("/reservations/guest/:reservationId", async (req, res) =
             return res.status(405).json({msg: "Operation not allowed"})
         }
 
-        const reservation =  await Reservation.findOne({_id: req.params.reservationId }).populate("parkingLot")
+        const reservation =  await Reservation.findOne({_id: req.params.reservationId}).populate("parkingLot")
 
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
         }
+
+        // add more validations??
 
         // generate paidCode if request.body.status = PAID and request.body.paidCode is undefined
         if(req.body.status && req.body.status === "PAID" && reservation.status === "OPEN"){
@@ -136,11 +135,12 @@ ReservationRouter.patch("/reservations/guest/:reservationId", async (req, res) =
 
         // calculate price if request.body.endedAt is defined but reservation.endedAt is not defined
         if(req.body.endedAt  && !reservation.endedAt){
-            const reservationDuration = new Date(reservation.createdAt) - new Date(req.body.endedAt)
+            const reservationDuration =  new Date(req.body.endedAt) - new Date(reservation.createdAt)
             req.body.price = calculatePrice(reservation.parkingLot.pricing, reservationDuration)
         }
 
-        reservation.forEach(update => reservation[update] = req.body[update])   
+        requestedUpdates = Object.keys(req.body)
+        requestedUpdates.forEach(update => reservation[update] = req.body[update])   
         
         await reservation.save()
 
@@ -151,8 +151,6 @@ ReservationRouter.patch("/reservations/guest/:reservationId", async (req, res) =
     }
 })
 
-
-
 ReservationRouter.get("/reservations/:reservationId", isAuthenticated, attachCurrentUser, isAdmin,  async (req, res) => {
     try{
         const reservations =  await Reservation.find()
@@ -162,7 +160,6 @@ ReservationRouter.get("/reservations/:reservationId", isAuthenticated, attachCur
         return res.status(500).json({msg: "Internal server error"})
     }
 })
-
 
 const generatePaidCode = () => {
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -177,6 +174,8 @@ const generatePaidCode = () => {
 }
 
 const calculatePrice = (pricing, duration) => {
+    console.log("pricing ",pricing)
+    console.log("duration ", duration)
     return 100  // to be updated
 }
 
