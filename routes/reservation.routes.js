@@ -34,11 +34,10 @@ ReservationRouter.post("/reservations", async (req, res) => {
     }
 } )
 
-
-ReservationRouter.get("/reservations/:guestUserPhone", async (req, res) => {
+ReservationRouter.get("/reservations/guest/:guestUserPhone", async (req, res) => {
     try{
         const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} })//.populate("parkingLot")
-        //await reservation.populate("parkingLot").execPopulate()
+        await reservation.populate("parkingLot").execPopulate()
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
         }
@@ -49,9 +48,11 @@ ReservationRouter.get("/reservations/:guestUserPhone", async (req, res) => {
     }
 })
 
-ReservationRouter.get("/reservations/:reservationId", isAuthenticated, attachCurrentUser,  async (req, res) => {
+ReservationRouter.get("/reservations/:reservationId/", isAuthenticated, attachCurrentUser,  async (req, res) => {
     try{
-        const reservation =  await Reservation.findOne({Id: req.params.reservationId})
+        
+        const reservation =  await Reservation.findOne({_id: req.params.reservationId})
+        await reservation.populate("parkingLot").execPopulate()
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
         }
@@ -62,11 +63,11 @@ ReservationRouter.get("/reservations/:reservationId", isAuthenticated, attachCur
     }
 })
 
-ReservationRouter.patch("/reservations/:guestPhoneNumber", async (req, res) => {
+ReservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) => {
     try{
         
         const allowedUpdates = ["vehicle", "endedAt", "payBy", "status"]
-        const requestedUpdates = Object.keys(req.body)
+        let requestedUpdates = Object.keys(req.body)
         const isValidOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
         if((req.body.status && req.body.status !=="PAID") || (req.body.payBy && req.body.payBy !=="CARD" ) ){
             isValidOperation = false
@@ -75,7 +76,7 @@ ReservationRouter.patch("/reservations/:guestPhoneNumber", async (req, res) => {
             return res.status(405).json({msg: "Operation not allowed"})
         }
 
-        const reservation =  await Reservation.findOne({guestPhoneNumber: req.params.guestPhoneNumber, status: {"$ne": "CLOSED"} }).populate("parkingLot")
+        const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} })//.populate("parkingLot")
 
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
@@ -94,7 +95,8 @@ ReservationRouter.patch("/reservations/:guestPhoneNumber", async (req, res) => {
             req.body.price = calculatePrice(reservation.parkingLot.pricing, reservationDuration)
         }
 
-        reservation.forEach(update => reservation[update] = req.body[update])   
+        requestedUpdates = Object.keys(req.body)
+        requestedUpdates.forEach(update => reservation[update] = req.body[update])   
         
         await reservation.save()
 
@@ -108,7 +110,7 @@ ReservationRouter.patch("/reservations/:guestPhoneNumber", async (req, res) => {
 /**
  * Only used to change status to closed
  */
-ReservationRouter.patch("/reservations/:reservationId", async (req, res) => {
+ReservationRouter.patch("/reservations/guest/:reservationId", async (req, res) => {
     try{
         
         const allowedUpdates = ["vehicle", "endedAt", "payBy", "status"]

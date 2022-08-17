@@ -54,7 +54,8 @@ const reservationSchema = new Schema({
     },
     parkingLot:{
         type: Schema.Types.ObjectId,
-        ref: "ParkingLot"
+        ref: "ParkingLot",
+        required: true
     }
 }, {timestamps: true}
 )

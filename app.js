@@ -25,3 +25,11 @@ app.listen(Number(process.env.EXPRESS_PORT), () =>
   console.log(`Server up and running at port ${process.env.EXPRESS_PORT}`)
 );
   
+
+// const main = () => {
+//   const date = new Date()
+//   console.log(date)
+// }
+
+// main()
+
