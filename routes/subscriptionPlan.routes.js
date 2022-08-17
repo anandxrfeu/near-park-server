@@ -32,11 +32,31 @@ SubscriptionPlanRouter.get("/subscriptionPlans", isAuthenticated, attachCurrentU
 SubscriptionPlanRouter.get("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
     try{
 
-        const subscriptonPlan = await SubscriptionPlan.find({_id: req.params.planId})
+        const subscriptonPlan = await SubscriptionPlan.findOne({_id: req.params.planId})
         if(!subscriptonPlan) {
             return res.status(404).json({msg: "Subscription plan not found"})
         }
         return res.status(200).json(subscriptonPlan)
+    } catch(err){
+        console.log(err)
+        return res.status(500).json({msg: "Interval server error"})
+    }
+})
+
+SubscriptionPlanRouter.patch("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
+    try{
+        const allowedUpdates = ["benefits", "pricePerTransaction", "pricePerMonth", "callToAction"]
+        const requestedUpdates = Object.keys(req.body)
+        const isValidOperation = requestedUpdates.every( update => allowedUpdates.includes(update))
+
+        if(!isValidOperation){
+            return res.status(405).json({msg: "Operation not allowed"})
+        }
+        const subscriptionPlan = await SubscriptionPlan.findOneAndUpdate({_id: req.params.planId, deletedAt: {$exists: false}} , req.body, {new: true})
+        if(!subscriptionPlan){
+            return res.status(405).json({msg: "Operation not allowed"})
+        }
+        return res.status(200).json(subscriptionPlan)
     } catch(err){
         console.log(err)
         return res.status(500).json({msg: "Interval server error"})
