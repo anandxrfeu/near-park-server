@@ -1,53 +1,99 @@
-![logo_ironhack_blue 7](https://user-images.githubusercontent.com/23629340/40541063-a07a0a8a-601a-11e8-91b5-2f13e4e6b441.png)
+<div id="top"></div>
 
-# IronREST Boilerplate
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
-Esse boilerplate para API RESTful já inclui:
 
-- Autenticação por tokens JWT usando o Passport
-- Conexão com banco de dados MongoDB usando Mongoose
-- Servidor Web usando Express pré-configurado com CORS e aceitando requisições JSON e Multipart Form
-- Upload de arquivos usando Cloudinary e Multer
 
-## Para Começar
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-- Faça o fork e clone deste repositório
 
-## Instalação
+[Near Park](https://near-park.netlify.app/) is SaaS for parking lot owners. Features includes
+* Register parking lots
+* Manage reservaions 
+* Analytics enabled dashboard
 
-```shell
-$ npm install
-```
+[Iron Park - Product Demo](https://TBD)
 
-## Desenvolvimento
 
-Para iniciar o servidor web localmente execute no seu terminal:
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-```shell
-$ npm run dev
-```
 
-## Deploy do MongoDB
+### Built With
 
-1. Faça login no https://account.mongodb.com/account/login?nds=true
-2. Crie um cluster gratuito
-3. Siga as instruções e obtenha a string de conexão com o banco
-4. Crie uma variável de ambiente MONGODB_URI no Heroku com a string de conexão copiada do Atlas
+* [MongodDB](https://www.mongodb.com/)
+* [Expressjs](http://expressjs.com/)
+* [React.js](https://reactjs.org/)
+* [Nodejs](https://nodejs.org/en/)
 
-## Deploy no Heroku
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-1. Faça login no Heroku e selecione seu repositório
-2. Habilite 'automatic deploys'
-3. No seu terminal, execute os seguintes comandos:
 
-```shell
-$ git add .
-$ git commit -m 'deploying'
-$ heroku git:remote -a nome-do-repo-no-heroku
-$ git push heroku master
-```
+<!-- GETTING STARTED -->
+## Getting Started
 
-4. Adicione uma variável de ambiente no Heroku para cada variável de ambiente presente no arquivo .env (não precisa criar a PORT no Heroku)
-5. Adicione a URL da sua API hospedada no Heroku nas variáveis de ambiente do app React no Netlify
+To get a local copy up and running follow these simple example steps.
 
-Happy coding! 💙
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/anandxrfeu/near-park-server.git
+   ```
+
+2. Install NPM packages
+   ```sh
+   npm install
+   ```
+
+4. Configure environment variables
+
+5. Run locally
+   ```sh
+   npm run dev
+   ```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+<!-- CONTACT -->
+## Contact
+
+* Anand Naidu - [@anandxrfeu](https://twitter.com/anandxrfeu)
+* Christian - [@Cglik001](https://github.com/Cglik001)
+
+Project Link: [[https://github.com/anandxrfeu/iron-park](https://github.com/anandxrfeu/iron-park.git)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* [Iron Hack](https://github.com/ironhack)
+* [Nilton Freitas](https://github.com/oniltos)
+* [Felipe Osório](https://github.com/Briofita09)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+
