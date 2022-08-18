@@ -5,13 +5,13 @@ import isAuthenticated from "../middlewares/isAuthenticated.js";
 import attachCurrentUser from "../middlewares/attachCurrentUser.js";
 import isAdmin from "../middlewares/isAdmin.js";
 
-const ReservationRouter = Router();
+const reservationRouter = Router();
 
 /**
  * A reservation can b created by owner or driver. In both cases driver phone number (guestUserPhone) is a required entry
  * This end point is public so a non logged in user can make a reservation
  */
-ReservationRouter.post("/reservations", async (req, res) => {
+reservationRouter.post("/reservations", async (req, res) => {
     try{
         //check of all fields
         const allowedFields = ["ticketNumber","vehicle", "owner", "guestUserPhone", "parkingLot"]
@@ -34,7 +34,7 @@ ReservationRouter.post("/reservations", async (req, res) => {
     }
 } )
 
-ReservationRouter.get("/reservations/guest/:guestUserPhone", async (req, res) => {
+reservationRouter.get("/reservations/guest/:guestUserPhone", async (req, res) => {
     try{
         const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} })//.populate("parkingLot")
         await reservation.populate("parkingLot").execPopulate()
@@ -48,7 +48,7 @@ ReservationRouter.get("/reservations/guest/:guestUserPhone", async (req, res) =>
     }
 })
 
-ReservationRouter.get("/reservations/:reservationId/", isAuthenticated, attachCurrentUser,  async (req, res) => {
+reservationRouter.get("/reservations/:reservationId/", isAuthenticated, attachCurrentUser,  async (req, res) => {
     try{
         
         const reservation =  await Reservation.findOne({_id: req.params.reservationId})
@@ -63,7 +63,7 @@ ReservationRouter.get("/reservations/:reservationId/", isAuthenticated, attachCu
     }
 })
 
-ReservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) => {
+reservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) => {
     try{
         
         const allowedUpdates = ["vehicle", "endedAt", "payBy", "status"]
@@ -107,7 +107,7 @@ ReservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) 
     }
 })
 
-ReservationRouter.patch("/reservations/:reservationId", isAuthenticated, attachCurrentUser, async (req, res) => {
+reservationRouter.patch("/reservations/:reservationId", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
         
         const allowedUpdates = ["vehicle", "endedAt", "payBy", "status"]
@@ -151,7 +151,7 @@ ReservationRouter.patch("/reservations/:reservationId", isAuthenticated, attachC
     }
 })
 
-ReservationRouter.get("/reservations/:reservationId", isAuthenticated, attachCurrentUser, isAdmin,  async (req, res) => {
+reservationRouter.get("/reservations/:reservationId", isAuthenticated, attachCurrentUser, isAdmin,  async (req, res) => {
     try{
         const reservations =  await Reservation.find()
         return res.status(200).json(reservations)
@@ -179,4 +179,4 @@ const calculatePrice = (pricing, duration) => {
     return 100  // to be updated
 }
 
-export default ReservationRouter;
+export default reservationRouter;

@@ -4,9 +4,9 @@ import isAuthenticated from '../middlewares/isAuthenticated.js'
 import attachCurrentUser from '../middlewares/attachCurrentUser.js';
 import isAdmin from '../middlewares/isAdmin.js'
 
-const SubscriptionPlanRouter = Router();
+const subscriptionPlanRouter = Router();
 
-SubscriptionPlanRouter.post("/subscriptionPlans", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
+subscriptionPlanRouter.post("/subscriptionPlans", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
     try{
         console.log("subscription plans..")
         const subscriptonPlan = await SubscriptionPlan.create(req.body)
@@ -17,7 +17,7 @@ SubscriptionPlanRouter.post("/subscriptionPlans", isAuthenticated, attachCurrent
     }
 })
 
-SubscriptionPlanRouter.get("/subscriptionPlans", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
+subscriptionPlanRouter.get("/subscriptionPlans", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
     try{
         console.log(req.query.active)
         console.log(typeof req.query.active)
@@ -29,7 +29,7 @@ SubscriptionPlanRouter.get("/subscriptionPlans", isAuthenticated, attachCurrentU
     }
 })
 
-SubscriptionPlanRouter.get("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
+subscriptionPlanRouter.get("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
     try{
 
         const subscriptonPlan = await SubscriptionPlan.findOne({_id: req.params.planId})
@@ -43,7 +43,7 @@ SubscriptionPlanRouter.get("/subscriptionPlans/:planId", isAuthenticated, attach
     }
 })
 
-SubscriptionPlanRouter.patch("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
+subscriptionPlanRouter.patch("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
     try{
         const allowedUpdates = ["benefits", "pricePerTransaction", "pricePerMonth", "callToAction"]
         const requestedUpdates = Object.keys(req.body)
@@ -63,7 +63,7 @@ SubscriptionPlanRouter.patch("/subscriptionPlans/:planId", isAuthenticated, atta
     }
 })
 
-SubscriptionPlanRouter.delete("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
+subscriptionPlanRouter.delete("/subscriptionPlans/:planId", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
     try{
 
         const subscriptonPlan = await SubscriptionPlan.findOneAndUpdate({_id: req.params.planId}, {deletedAt: new Date()}, {new: true})
@@ -77,4 +77,4 @@ SubscriptionPlanRouter.delete("/subscriptionPlans/:planId", isAuthenticated, att
     }
 })
 
-export default SubscriptionPlanRouter;
+export default subscriptionPlanRouter;

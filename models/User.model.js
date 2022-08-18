@@ -31,6 +31,18 @@ const UserSchema = new Schema({
   timestamps: true
 });
 
+UserSchema.virtual("subscriptions", {
+  ref: "UserSubscription",
+  localField: "_id",
+  foreignField: "user"
+})
+
+UserSchema.virtual("subscriptionPayments", {
+  ref: "SubscriptionPayment",
+  localField: "_id",
+  foreignField: "user"
+})
+
 UserSchema.pre("save", function(next){
   const user = this;
   if(user.isModified("password")){
