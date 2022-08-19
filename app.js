@@ -26,6 +26,6 @@ app.use("/api", subscriptionPlanRouter);
 app.use("/api", userSubscriptionRouter);
 app.use("/api", subscriptionPaymentRouter);
 
-app.listen(Number(process.env.EXPRESS_PORT), () =>
+app.listen(Number(process.env.PORT), () =>
   console.log(`Server up and running at port ${process.env.EXPRESS_PORT}`)
 );
