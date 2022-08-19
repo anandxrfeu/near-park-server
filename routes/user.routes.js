@@ -119,7 +119,7 @@ userRouter.get("/users", isAuthenticated, attachCurrentUser, isAdmin, async (req
     const users = await User.find(
                         req.query.role ? {role: req.query.role.toUpperCase()} : {}
                         //,req.query.role ? {role: req.query.role.toUpperCase()} : {}
-                        )
+                        , "-__v")
    // const users = await User.find({role: "OWNER"})
     return res.status(200).json(users)
   }catch (err) {

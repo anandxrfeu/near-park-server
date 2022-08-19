@@ -26,7 +26,9 @@ const subscriptionPlanSchema = new Schema({
     deletedAt:{
         type: Date
     }
-})
+},{
+    timestamps: true
+  })
 
 const subscriptionPlan = model("SubscriptionPlan", subscriptionPlanSchema)
 

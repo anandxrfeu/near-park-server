@@ -11,7 +11,8 @@ userSubscriptionRouter.post("/userSubscriptions", isAuthenticated, attachCurrent
         if(existingUserSubscriptions.length !== 0){
             return res.status(405).json({msg: "User has active subscription"})
         }
-        const userSubscription = await UserSubscription.create(req.body)
+        const userSubscription = await UserSubscription.create({...req.body, user: req.currentUser._id})
+        userSubscription.__v = undefined
         return res.status(201).json(userSubscription)
     }catch(err){
         console.log(err)
@@ -25,10 +26,11 @@ userSubscriptionRouter.patch("/userSubscriptions/:id", isAuthenticated, attachCu
         if(!isValidOperation){
             return res.status(405).json({msg : "Operation not allowed"})
         }
-        const userSubscription = await UserSubscription.findOneAndUpdate({_id:id}, req.body, {new: true})
+        const userSubscription = await UserSubscription.findOneAndUpdate({_id:req.params.id}, req.body, {new: true})
         if(!userSubscription){
             return res.status(404).json({msg: "UserSubscription not found"})
         }
+        userSubscription.__v = undefined
         return res.status(200).json(userSubscription)
     }catch(err){
         console.log(err)

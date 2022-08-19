@@ -26,6 +26,7 @@ reservationRouter.post("/reservations", async (req, res) => {
             return res.status(405).json({msg: "User has an active reservation"})
         }
         const reservation = await Reservation.create(req.body)
+        reservation.__v = undefined
         return res.status(201).json(reservation)
 
     }catch(err){
@@ -36,7 +37,7 @@ reservationRouter.post("/reservations", async (req, res) => {
 
 reservationRouter.get("/reservations/guest/:guestUserPhone", async (req, res) => {
     try{
-        const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} })//.populate("parkingLot")
+        const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} }, "-__v")//.populate("parkingLot")
         await reservation.populate("parkingLot").execPopulate()
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
@@ -91,15 +92,14 @@ reservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) 
 
         // calculate price if request.body.endedAt is defined but reservation.endedAt is not defined
         if(req.body.endedAt  && !reservation.endedAt){
-            const reservationDuration = new Date(reservation.createdAt) - new Date(req.body.endedAt)
-            req.body.price = calculatePrice(reservation.parkingLot.pricing, reservationDuration)
+            req.body.price = calculatePrice(reservation.parkingLot.pricing, reservation.createdAt, req.body.endedAt)
         }
 
         requestedUpdates = Object.keys(req.body)
         requestedUpdates.forEach(update => reservation[update] = req.body[update])   
         
         await reservation.save()
-
+        reservation.__v = undefined
         return res.status(200).json(reservation)
     }catch(err){
         console.log(err)
@@ -135,13 +135,12 @@ reservationRouter.patch("/reservations/:reservationId", isAuthenticated, attachC
 
         // calculate price if request.body.endedAt is defined but reservation.endedAt is not defined
         if(req.body.endedAt  && !reservation.endedAt){
-            const reservationDuration =  new Date(req.body.endedAt) - new Date(reservation.createdAt)
-            req.body.price = calculatePrice(reservation.parkingLot.pricing, reservationDuration)
+            req.body.price = calculatePrice(reservation.parkingLot.pricing, reservation.createdAt, req.body.endedAt)
         }
 
         requestedUpdates = Object.keys(req.body)
         requestedUpdates.forEach(update => reservation[update] = req.body[update])   
-        
+        reservation.__v = undefined
         await reservation.save()
 
         return res.status(200).json(reservation)
@@ -173,10 +172,24 @@ const generatePaidCode = () => {
     return paidCode
 }
 
-const calculatePrice = (pricing, duration) => {
-    console.log("pricing ",pricing)
-    console.log("duration ", duration)
-    return 100  // to be updated
+
+const calculatePrice = (pricing, start, end) => {
+    console.log(pricing, start, end)
+    const startDate = new Date(start)
+    const endDate = new Date(end)
+    let price = 0
+    const durationInHours = Math.ceil((endDate.valueOf() - startDate.valueOf())/3600000)
+    if(durationInHours >= 24){
+        price = parseInt(pricing.twentyFourHourPrice) + (durationInHours - 24)*parseInt(pricing.oneHourAdditionalPrice)
+    } else if (durationInHours >= 8 ){
+        price = parseInt(pricing.eightHourPrice) + (durationInHours - 8)*parseInt(pricing.oneHourAdditionalPrice)
+    }else{
+        price = parseInt(pricing.oneHourPrice) + (durationInHours - 1)*parseInt(pricing.oneHourAdditionalPrice)
+    }
+    console.log("price > ",price)
+    return price
 }
+
+
 
 export default reservationRouter;

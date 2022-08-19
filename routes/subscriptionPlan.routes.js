@@ -8,8 +8,8 @@ const subscriptionPlanRouter = Router();
 
 subscriptionPlanRouter.post("/subscriptionPlans", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
     try{
-        console.log("subscription plans..")
         const subscriptonPlan = await SubscriptionPlan.create(req.body)
+        subscriptonPlan.__v = undefined
         return res.status(201).json(subscriptonPlan)
     } catch(err){
         console.log(err)
@@ -21,7 +21,7 @@ subscriptionPlanRouter.get("/subscriptionPlans", isAuthenticated, attachCurrentU
     try{
         console.log(req.query.active)
         console.log(typeof req.query.active)
-        const subscriptonPlans = await SubscriptionPlan.find(req.query.active === "true" ?  {deletedAt: {$exists: false}} : {})
+        const subscriptonPlans = await SubscriptionPlan.find(req.query.active === "true" ?  {deletedAt: {$exists: false}} : {}, "-__v")
         return res.status(200).json(subscriptonPlans)
     } catch(err){
         console.log(err)
@@ -36,6 +36,7 @@ subscriptionPlanRouter.get("/subscriptionPlans/:planId", isAuthenticated, attach
         if(!subscriptonPlan) {
             return res.status(404).json({msg: "Subscription plan not found"})
         }
+        subscriptonPlan.__v = undefined
         return res.status(200).json(subscriptonPlan)
     } catch(err){
         console.log(err)
@@ -56,6 +57,7 @@ subscriptionPlanRouter.patch("/subscriptionPlans/:planId", isAuthenticated, atta
         if(!subscriptionPlan){
             return res.status(405).json({msg: "Operation not allowed"})
         }
+        subscriptionPlan.__v = undefined
         return res.status(200).json(subscriptionPlan)
     } catch(err){
         console.log(err)
