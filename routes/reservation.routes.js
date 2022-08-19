@@ -14,7 +14,7 @@ const reservationRouter = Router();
 reservationRouter.post("/reservations", async (req, res) => {
     try{
         //check of all fields
-        const allowedFields = ["ticketNumber","vehicle", "owner", "guestUserPhone", "parkingLot"]
+        const allowedFields = ["vehicle", "owner", "guestUserPhone", "parkingLot"]
         const providedFields = Object.keys(req.body)
         const isValidOperation = providedFields.every(field => allowedFields.includes(field))
         if(!isValidOperation){
@@ -25,7 +25,7 @@ reservationRouter.post("/reservations", async (req, res) => {
         if(existingReservations.length !== 0){
             return res.status(405).json({msg: "User has an active reservation"})
         }
-        const reservation = await Reservation.create(req.body)
+        const reservation = await Reservation.create({...req.body, ticket: generatePaidCode()})
         reservation.__v = undefined
         return res.status(201).json(reservation)
 

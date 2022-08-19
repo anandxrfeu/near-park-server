@@ -3,8 +3,8 @@ const { Schema, model } = mongoose
 
 const reservationSchema = new Schema({
 
-    ticketNumber:{
-        type: Number,
+    ticket:{
+        type: String,
         required: true,
         unique: true
     },
