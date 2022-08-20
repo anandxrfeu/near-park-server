@@ -30,5 +30,5 @@ app.use("/api", userSubscriptionRouter);
 app.use("/api", subscriptionPaymentRouter);
 
 app.listen(Number(process.env.PORT), () =>
-  console.log(`Server up and running at port ${process.env.EXPRESS_PORT}`)
+  console.log(`Server up and running at port ${process.env.PORT}`)
 );
