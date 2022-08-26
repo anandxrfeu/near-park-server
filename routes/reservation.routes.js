@@ -25,7 +25,9 @@ reservationRouter.post("/reservations", async (req, res) => {
         if(existingReservations.length !== 0){
             return res.status(405).json({msg: "User has an active reservation"})
         }
-        const reservation = await Reservation.create({...req.body, ticket: generatePaidCode()})
+        const ticketNumber = generatePaidCode()
+        console.log("ticketNumber", ticketNumber)
+        const reservation = await Reservation.create({...req.body, ticket: ticketNumber})
         reservation.__v = undefined
         return res.status(201).json(reservation)
 
@@ -51,7 +53,7 @@ reservationRouter.get("/reservations/guest/:guestUserPhone", async (req, res) =>
 
 reservationRouter.get("/reservations/:reservationId/", isAuthenticated, attachCurrentUser,  async (req, res) => {
     try{
-        
+
         const reservation =  await Reservation.findOne({_id: req.params.reservationId})
         await reservation.populate("parkingLot").execPopulate()
         if(!reservation){
@@ -66,7 +68,7 @@ reservationRouter.get("/reservations/:reservationId/", isAuthenticated, attachCu
 
 reservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) => {
     try{
-        
+
         const allowedUpdates = ["vehicle", "endedAt", "payBy", "status"]
         let requestedUpdates = Object.keys(req.body)
         const isValidOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
@@ -96,8 +98,8 @@ reservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) 
         }
 
         requestedUpdates = Object.keys(req.body)
-        requestedUpdates.forEach(update => reservation[update] = req.body[update])   
-        
+        requestedUpdates.forEach(update => reservation[update] = req.body[update])
+
         await reservation.save()
         reservation.__v = undefined
         return res.status(200).json(reservation)
@@ -109,8 +111,8 @@ reservationRouter.patch("/reservations/guest/:guestUserPhone", async (req, res) 
 
 reservationRouter.patch("/reservations/:reservationId", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
-        
-        const allowedUpdates = ["vehicle", "endedAt", "payBy", "status"]
+
+        const allowedUpdates = ["vehicle", "endedAt", "payBy", "status", "guestUserPhone"]
         let requestedUpdates = Object.keys(req.body)
         let isValidOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
         if((req.body.status && req.body.status ==="OPEN") || (req.body.payBy && req.body.payBy !=="CARD" ) ){
@@ -139,7 +141,7 @@ reservationRouter.patch("/reservations/:reservationId", isAuthenticated, attachC
         }
 
         requestedUpdates = Object.keys(req.body)
-        requestedUpdates.forEach(update => reservation[update] = req.body[update])   
+        requestedUpdates.forEach(update => reservation[update] = req.body[update])
         reservation.__v = undefined
         await reservation.save()
 
@@ -164,11 +166,11 @@ const generatePaidCode = () => {
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
     let paidCode = ""
     var charactersLength = characters.length;
-    
+
     for ( let i = 0; i < 5 ; i++ ) {
         paidCode += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    
+
     return paidCode
 }
 
