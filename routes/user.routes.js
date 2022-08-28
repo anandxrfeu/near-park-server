@@ -156,8 +156,14 @@ userRouter.patch("/users/:userId", isAuthenticated, attachCurrentUser, isAdmin, 
 
 userRouter.get("/users/profile/subscriptions", isAuthenticated, attachCurrentUser, async (req, res) => {
   try{
-    const user = await User.find(req.query.status === "ACTIVE" ?  {_id: req.currentUser._id, status: "ACTIVE"} : {}).populate("subscriptions")
-    return res.status(200).json(user.subscriptions)
+    const user = await User.findOne({_id: req.currentUser._id},"-__v").populate("subscriptions")
+    if(req.query.status === "ACTIVE" ){
+      const activeSubscription = user.subscriptions.find(sub => sub.status === "ACTIVE")
+      activeSubscription.__v = undefined
+      return res.status(200).json(activeSubscription)      
+    }else{
+      return res.status(200).json(user.subscriptions)
+    }
   }catch(err){
     console.log(err)
     return res.status(500).json({msg: "Internal server error"})  
@@ -166,7 +172,7 @@ userRouter.get("/users/profile/subscriptions", isAuthenticated, attachCurrentUse
 
 userRouter.get("/users/profile/subscriptionPayments", isAuthenticated, attachCurrentUser, async (req, res) => {
   try{
-    const subscriptionPayments = await User.findById(req.currentUser._id).populate("subscriptionPayments")
+    const user = await User.findById(req.currentUser._id).populate("subscriptionPayments")
     return res.status(200).json(user.subscriptionPayments)
   }catch(err){
     console.log(err)
