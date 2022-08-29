@@ -159,6 +159,9 @@ userRouter.get("/users/profile/subscriptions", isAuthenticated, attachCurrentUse
     const user = await User.findOne({_id: req.currentUser._id},"-__v").populate("subscriptions")
     if(req.query.status === "ACTIVE" ){
       const activeSubscription = user.subscriptions.find(sub => sub.status === "ACTIVE")
+      if(!activeSubscription){
+        return res.status(404).json({msg: "No active subscription for user"})
+      }
       activeSubscription.__v = undefined
       return res.status(200).json(activeSubscription)      
     }else{

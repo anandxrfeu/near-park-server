@@ -9,6 +9,7 @@ userSubscriptionRouter.post("/userSubscriptions", isAuthenticated, attachCurrent
     try{
         const existingUserSubscriptions = await UserSubscription.find({user: req.currentUser._id, status: "ACTIVE"})
         if(existingUserSubscriptions.length !== 0){
+            
             return res.status(405).json({msg: "User has active subscription"})
         }
         const userSubscription = await UserSubscription.create({...req.body, user: req.currentUser._id})
