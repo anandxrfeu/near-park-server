@@ -6,16 +6,32 @@ import isAdmin from "../middlewares/isAdmin.js";
 
 const userSubscriptionRouter = Router();
 
+// userSubscriptionRouter.post("/userSubscriptions", isAuthenticated, attachCurrentUser, async (req, res) => {
+//     try{
+//         const existingUserSubscriptions = await UserSubscription.find({user: req.currentUser._id, status: "ACTIVE"})
+//         if(existingUserSubscriptions.length !== 0){
+            
+//             return res.status(405).json({msg: "User has active subscription"})
+//         }
+//         const userSubscription = await UserSubscription.create({...req.body, user: req.currentUser._id})
+//         userSubscription.__v = undefined
+//         return res.status(201).json(userSubscription)
+//     }catch(err){
+//         console.log(err)
+//         return res.status(500).json({msg : "Internal server error"})
+//     }
+// } )
+
 userSubscriptionRouter.post("/userSubscriptions", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
-        const existingUserSubscriptions = await UserSubscription.find({user: req.currentUser._id, status: "ACTIVE"})
-        if(existingUserSubscriptions.length !== 0){
-            
-            return res.status(405).json({msg: "User has active subscription"})
+        const existingUserSubscription = await UserSubscription.findOne({user: req.currentUser._id, status: "ACTIVE"})
+      
+        if(existingUserSubscription){
+            await UserSubscription.findOneAndUpdate({_id:existingUserSubscription._id}, {"status": "INACTIVE"}, {new: true})
         }
-        const userSubscription = await UserSubscription.create({...req.body, user: req.currentUser._id})
-        userSubscription.__v = undefined
-        return res.status(201).json(userSubscription)
+        const newUserSubscription = await UserSubscription.create({...req.body, user: req.currentUser._id})
+        newUserSubscription.__v = undefined
+        return res.status(201).json(newUserSubscription)
     }catch(err){
         console.log(err)
         return res.status(500).json({msg : "Internal server error"})
