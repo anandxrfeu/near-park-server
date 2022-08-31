@@ -17,10 +17,8 @@ subscriptionPlanRouter.post("/subscriptionPlans", isAuthenticated, attachCurrent
     }
 })
 
-subscriptionPlanRouter.get("/subscriptionPlans", isAuthenticated, attachCurrentUser, isAdmin, async (req, res) => {
+subscriptionPlanRouter.get("/subscriptionPlans", async (req, res) => {
     try{
-        console.log(req.query.active)
-        console.log(typeof req.query.active)
         const subscriptonPlans = await SubscriptionPlan.find(req.query.active === "true" ?  {deletedAt: {$exists: false}} : {}, "-__v")
         return res.status(200).json(subscriptonPlans)
     } catch(err){
