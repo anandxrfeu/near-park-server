@@ -40,10 +40,10 @@ reservationRouter.post("/reservations", async (req, res) => {
 reservationRouter.get("/reservations/guest/:guestUserPhone", async (req, res) => {
     try{
         const reservation =  await Reservation.findOne({guestUserPhone: req.params.guestUserPhone, status: {"$ne": "CLOSED"} }, "-__v")//.populate("parkingLot")
-        await reservation.populate("parkingLot").execPopulate()
         if(!reservation){
             return res.status(404).json({msg: "Reservation not found"})
         }
+        await reservation.populate("parkingLot").execPopulate()
         return res.status(200).json(reservation)
     }catch(err){
         console.log(err)

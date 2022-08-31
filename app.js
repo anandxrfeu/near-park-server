@@ -16,7 +16,8 @@ const app = express();
 
 app.use(express.json());
 // Não esquecer de criar variável de ambiente com o endereço do seu app React (local ou no Netlify)
-app.use(cors({ origin: process.env.REACT_APP_URL }));
+//app.use(cors({ origin: process.env.REACT_APP_URL }));
+app.use(cors())
 
 app.get("/api/health", (req, res)=>{
   return res.status(200).json({ok: true})
