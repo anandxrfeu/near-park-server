@@ -28,7 +28,7 @@ userRouter.post("/users/signup", async (req, res) => {
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
+    return res.status(500).json({msg: "Internal server error!"});
   }
 });
 
@@ -39,10 +39,10 @@ userRouter.post("/users/login", async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ msg: "This email is not yet registered in our website;" });
+        .json({ msg: "This email is not yet registered in our website!" });
     }
     if(user.deletedAt){
-      return res.status(401).json({msg: "You do not have permission to this." })
+      return res.status(401).json({msg: "You do not have permission to this!" })
     }
     if (bcrypt.compareSync(password, user.password)) {
       const token = generateToken(user);
@@ -57,11 +57,11 @@ userRouter.post("/users/login", async (req, res) => {
         token,
       });
     } else {
-      return res.status(401).json({ msg: "Wrong password or email" });
+      return res.status(401).json({ msg: "Wrong password or email!" });
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
+    return res.status(500).json({msg: "Internal server error!"});
   }
 });
 
@@ -73,11 +73,11 @@ userRouter.get("/users/profile", isAuthenticated, attachCurrentUser, (req, res) 
     if (loggedInUser) {
       return res.status(200).json(loggedInUser);
     } else {
-      return res.status(404).json({ msg: "User not found." });
+      return res.status(404).json({ msg: "User not found!" });
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
+    return res.status(500).json({msg: "Internal server error!"})
   }
 });
 
@@ -89,7 +89,7 @@ userRouter.patch("/users/profile", isAuthenticated, attachCurrentUser, async (re
     const isValidOperaton = requestedUpdates.every(update => allowedUpdates.includes(update))
 
     if(!isValidOperaton){
-      return res.status(405).json({msg: "Operation not allowed"})
+      return res.status(405).json({msg: "Operation not allowed!"})
     }
     const loggedInUser = req.currentUser;
     requestedUpdates.forEach(update => loggedInUser[update] = req.body[update])
@@ -97,7 +97,7 @@ userRouter.patch("/users/profile", isAuthenticated, attachCurrentUser, async (re
     return res.status(200).json(loggedInUser)
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
+    return res.status(500).json({msg: "Internal server error!"});
   }
 });
 
@@ -109,7 +109,7 @@ userRouter.delete("/users/profile", isAuthenticated, attachCurrentUser, async (r
     return res.status(204).json(loggedInUser)
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
+    return res.status(500).json({msg: "Internal server error!"});
   }
 });
 
@@ -138,19 +138,19 @@ userRouter.patch("/users/:userId", isAuthenticated, attachCurrentUser, isAdmin, 
                              userId !== req.currentUser._id.toString()
 
     if(!isValidOperation){
-      return res.status(405).json({msg: "Method not allowed"})
+      return res.status(405).json({msg: "Method not allowed!"})
 
     }
     const user = await User.findByIdAndUpdate(userId, req.body.active === true ? {deletedAt: undefined} :  {deletedAt: Date.now()} , {new: true})
     console.log(user)
     if(!user){
-      return res.status(404).json({ msg: "User not found." });
+      return res.status(404).json({ msg: "User not found!" });
     }
     return res.status(200).json(user)
     
   }catch(err) {
     console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
+    return res.status(500).json({ msg: "Internal server error!" });
   }
 } )
 
@@ -160,7 +160,7 @@ userRouter.get("/users/profile/subscriptions", isAuthenticated, attachCurrentUse
     if(req.query.status === "ACTIVE" ){
       const activeSubscription = user.subscriptions.find(sub => sub.status === "ACTIVE")
       if(!activeSubscription){
-        return res.status(404).json({msg: "No active subscription for user"})
+        return res.status(404).json({msg: "No active subscription for user!"})
       }
       activeSubscription.__v = undefined
       return res.status(200).json(activeSubscription)      
@@ -169,7 +169,7 @@ userRouter.get("/users/profile/subscriptions", isAuthenticated, attachCurrentUse
     }
   }catch(err){
     console.log(err)
-    return res.status(500).json({msg: "Internal server error"})  
+    return res.status(500).json({msg: "Internal server error!"})  
   }
 })
 
@@ -179,7 +179,7 @@ userRouter.get("/users/profile/subscriptionPayments", isAuthenticated, attachCur
     return res.status(200).json(user.subscriptionPayments)
   }catch(err){
     console.log(err)
-    return res.status(500).json({msg: "Internal server error"})
+    return res.status(500).json({msg: "Internal server error!"})
   }
 })
 
