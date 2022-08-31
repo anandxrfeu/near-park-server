@@ -33,6 +33,20 @@ parkingLotRouter.get("/parkingLots", isAuthenticated, attachCurrentUser, async (
     }
 } )
 
+parkingLotRouter.get("/parkingLots/:parkingLotId/pricing",  async (req, res) => {
+    try{
+        const parkingLot = await ParkingLot.findOne({_id: req.params.parkingLotId})
+        if(!parkingLot){
+            return res.status(404).json({ msg: "Parking lot not found."})
+        }
+        parkingLot.__v = undefined
+        return res.status(200).json(parkingLot.pricing)
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({msg: "Internal server error."})
+    }
+} )
+
 parkingLotRouter.get("/parkingLots/:parkingLotId", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
         const parkingLot = await ParkingLot.findOne({_id: req.params.parkingLotId, user: req.currentUser._id})
@@ -59,7 +73,7 @@ parkingLotRouter.patch("/parkingLots/:parkingLotId", isAuthenticated, attachCurr
         if(!parkingLot){
             return res.status(404).json({msg: "Parking lot not found"})
         }
-        //TO DO 
+        //TO DO
         // check if parking lot has an active reservation
         // use populate
         requestedUpdates.forEach(update => parkingLot[update] = req.body[update])
@@ -74,7 +88,7 @@ parkingLotRouter.patch("/parkingLots/:parkingLotId", isAuthenticated, attachCurr
 
 parkingLotRouter.delete("/parkingLots/:parkingLotId", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
-         //TO DO 
+         //TO DO
         // check if parking lot has an active reservation
         // use populat
         const parkingLot = await ParkingLot.findOneAndDelete({_id: req.params.parkingLotId, user: req.currentUser._id})
