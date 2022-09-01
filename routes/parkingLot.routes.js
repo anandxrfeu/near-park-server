@@ -88,14 +88,21 @@ parkingLotRouter.patch("/parkingLots/:parkingLotId", isAuthenticated, attachCurr
 
 parkingLotRouter.delete("/parkingLots/:parkingLotId", isAuthenticated, attachCurrentUser, async (req, res) => {
     try{
-         //TO DO
+        //TO DO
         // check if parking lot has an active reservation
         // use populat
-        const parkingLot = await ParkingLot.findOneAndDelete({_id: req.params.parkingLotId, user: req.currentUser._id})
+        const parkingLot = await ParkingLot.findOne({_id: req.params.parkingLotId, user: req.currentUser._id})
         if(!parkingLot){
             return res.status(404).json({ msg: "Parking lot not found."})
         }
-        return res.status(204).json(parkingLot)
+        await parkingLot.populate("reservations").execPopulate()
+        const reservations = parkingLot.reservations
+        const openReservations = reservations.find(reservation => reservation.status !== "CLOSED")
+        if(openReservations){
+            return res.status(405).json({msg: "Active reservation exists"})
+        }
+        const parkingLotDelete = await ParkingLot.findOneAndDelete({_id: req.params.parkingLotId, user: req.currentUser._id})
+        return res.status(204).json(parkingLotDelete)
     }catch(err){
         console.log(err);
         return res.status(500).json({msg: "Internal server error."})
