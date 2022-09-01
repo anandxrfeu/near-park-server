@@ -15,6 +15,18 @@ dbConnect()
 const app = express();
 
 app.use(express.json());
+
+var whitelist = [process.env.REACT_WEB_APP_URL , process.env.REACT_MOBILE_APP_URL ]
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
 // Não esquecer de criar variável de ambiente com o endereço do seu app React (local ou no Netlify)
 //app.use(cors({ origin: process.env.REACT_APP_URL }));
 app.use(cors())
@@ -22,13 +34,13 @@ app.use(cors())
 app.get("/api/health", (req, res)=>{
   return res.status(200).json({ok: true})
 })
-app.use("/api", userRouter);
-app.use("/api", fileRouter);
-app.use("/api", parkingLotRouter);
-app.use("/api", reservationRouter);
-app.use("/api", subscriptionPlanRouter);
-app.use("/api", userSubscriptionRouter);
-app.use("/api", subscriptionPaymentRouter);
+app.use("/api", cors(corsOptions), userRouter);
+app.use("/api", cors(corsOptions), fileRouter);
+app.use("/api", cors(corsOptions), parkingLotRouter);
+app.use("/api", cors(corsOptions), reservationRouter);
+app.use("/api", cors(corsOptions), subscriptionPlanRouter);
+app.use("/api", cors(corsOptions), userSubscriptionRouter);
+app.use("/api", cors(corsOptions), subscriptionPaymentRouter);
 
 app.listen(Number(process.env.PORT), () =>
   console.log(`Server up and running at port ${process.env.PORT}`)
