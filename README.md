@@ -26,13 +26,10 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-
-[Near Park](https://near-park.netlify.app/) is SaaS for parking lot owners. Features includes
-* Register parking lots
-* Manage reservaions 
-* Analytics enabled dashboard
-
-[Iron Park - Product Demo](https://TBD)
+Near Park server is the api that powers [Near Park](https://nearpark.netlify.app/), a SaaS for parking lot owners and [Near Park mobile](https://nearparkmobile.netlify.app/), a mobile app vehicle owners. Features includes
+* Make reservations as a vehicle owner
+* Manage parkinglots and reservations
+* Admin user management
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
